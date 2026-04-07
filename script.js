@@ -1,5 +1,8 @@
 // Récupération des éléments
 const addButtons = document.querySelectorAll('.btn-add');
+const cartHeader = document.getElementById('cart-header');
+const cartBadge = document.getElementById('cart-badge');
+const successToast = document.getElementById('success-toast');
 const cartItemsList = document.getElementById('cart-items');
 const cartTotalSpan = document.getElementById('cart-total');
 const btnClear = document.getElementById('btn-clear');
@@ -39,6 +42,15 @@ function renderCart() {
     });
 
     cartTotalSpan.textContent = total.toLocaleString('en-US');
+    cartBadge.textContent = cart.length;
+}
+
+function showToast() {
+    successToast.textContent = 'Produit ajouté au panier ! 🛒';
+    successToast.classList.add('show');
+    setTimeout(() => {
+        successToast.classList.remove('show');
+    }, 3000);
 }
 
 addButtons.forEach((btn) => {
@@ -55,13 +67,41 @@ addButtons.forEach((btn) => {
 
         cart.push(newItem);
         renderCart();
+        showToast();
     });
 });
+
+cartHeader.addEventListener('click', () => {
+    const panier = document.getElementById('panier');
+    const backdrop = document.querySelector('.cart-backdrop') || createBackdrop();
+    
+    const isOpen = panier.classList.contains('open');
+    
+    if (isOpen) {
+        panier.classList.remove('open');
+        backdrop.classList.remove('show');
+    } else {
+        panier.classList.add('open');
+        backdrop.classList.add('show');
+        renderCart(); // Refresh
+    }
+});
+
+function createBackdrop() {
+    const backdrop = document.createElement('div');
+    backdrop.classList.add('cart-backdrop');
+    backdrop.addEventListener('click', () => {
+        document.getElementById('panier').classList.remove('open');
+        backdrop.classList.remove('show');
+    });
+    document.body.appendChild(backdrop);
+    return backdrop;
+}
 
 btnClear.addEventListener('click', () => {
     cart = [];
     renderCart();
 });
 
-// Appel initial
+
 renderCart()
